@@ -28,6 +28,12 @@ RUN git clone https://github.com/raspberrypi/userland.git \
     && ./buildme \
     && cd .. && rm -rf userland
 
+ENV LD_LIBRARY_PATH /opt/vc/lib
+
+RUN apt-get update \
+    && apt-get install -y pkg-config \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 RUN git clone --depth=1 git://source.ffmpeg.org/ffmpeg.git \
     && cd ffmpeg \
     && ./configure \
@@ -39,9 +45,8 @@ RUN git clone --depth=1 git://source.ffmpeg.org/ffmpeg.git \
       --enable-nonfree \
       --enable-omx \
       --enable-omx-rpi \
+      --enable-mmal \
     && make -j4 \
     && make install \
     && ldconfig \
     && cd .. && rm -rf ffmpeg
-
-ENV LD_LIBRARY_PATH /opt/vc/lib
