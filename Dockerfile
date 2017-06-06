@@ -50,3 +50,7 @@ RUN git clone --depth=1 git://source.ffmpeg.org/ffmpeg.git \
     && make install \
     && ldconfig \
     && cd .. && rm -rf ffmpeg
+
+COPY transcoder /usr/sbin/transcoder
+
+RUN chmod +x /usr/sbin/transcoder

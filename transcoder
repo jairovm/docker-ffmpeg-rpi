@@ -1,0 +1,29 @@
+#!/bin/bash
+
+transcode () {
+  TS_FILE="$1"
+  MP4_FILE=${TS_FILE/%.ts/.mp4}
+  TMP_FILE='/transcoder/video.mp4'
+
+  rm -f $TMP_FILE
+  
+  ffmpeg \
+    -i "$TS_FILE" \
+    -c:a copy \
+    -crf 18 \
+    -preset veryslow \
+    -b:v 2000k \
+    -maxrate 2000k \
+    -bufsize 4000k \
+    -vf scale=-1:720 \
+    -r 29.97 \
+    -c:v h264_omx \
+    "$TMP_FILE"
+
+  mv "$TMP_FILE" "$MP4_FILE"
+  rm "$TS_FILE"
+}
+
+FILE=$(find /data -name '*.ts' | head -n 1)
+
+[ ! -z "$FILE" ] && transcode "$FILE"
