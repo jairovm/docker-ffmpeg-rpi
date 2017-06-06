@@ -1,0 +1,29 @@
+[Unit]
+Description=ffmpeg transcoder
+After=docker.service
+Requires=docker.service
+
+[Service]
+TimeoutStartSec=0
+KillMode=none
+Restart=always
+RestartSec=30s
+
+Environment=CONTAINER=%p
+Environment=DOCKER_IMAGE=docker-ffmpeg-rpi
+Environment=DOCKER_NAMESPACE_IMAGES=jairovm
+Environment=PMS_FOLDER=/pms
+
+ExecStartPre=-/usr/bin/docker kill ${CONTAINER}
+ExecStartPre=-/usr/bin/docker rm ${CONTAINER}
+ExecStart=/usr/bin/docker run \
+  --name ${CONTAINER} \
+  --device /dev/vchiq:/dev/vchiq \
+  -v ${PMS_FOLDER}/data:/data \
+  -v ${PMS_FOLDER}/transcoder:/transcoder \
+  ${DOCKER_NAMESPACE_IMAGES}/${DOCKER_IMAGE} /usr/sbin/transcoder
+
+ExecStop=/usr/bin/docker stop ${CONTAINER}
+
+[Install]
+WantedBy=multi-user.target
